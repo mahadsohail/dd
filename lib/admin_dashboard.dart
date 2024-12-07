@@ -6,7 +6,7 @@ import 'doctor_model.dart';
 import 'patient_model.dart';
 import 'category_model.dart';
 import 'admin_model.dart';
-import 'user_model.dart'; // Import UserModel
+import 'user_model.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -44,11 +44,9 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
     super.dispose();
   }
 
-  // Add a new category
   void _addCategory(String name) async {
     CategoryModel newCategory = CategoryModel(
       categoryId: '',
-      // New category, so categoryId will be generated in Firestore
       name: name,
       disabled: false,
     );
@@ -59,7 +57,6 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
   }
 
   void _enableCategory(String categoryId) async {
-    // Update the category's "disabled" field to false (enabled)
     await _firestore.collection('categories').doc(categoryId).update({
       'disabled': false,
     });
@@ -69,7 +66,6 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
   }
 
   void _disableCategory(String categoryId) async {
-    // Update the category's "disabled" field to true (disabled)
     await _firestore.collection('categories').doc(categoryId).update({
       'disabled': true,
     });
@@ -78,7 +74,6 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
     );
   }
 
-  // Disable or enable a patient
   void _togglePatientStatus(PatientModel patient) async {
     if (patient.disabled) {
       await patient.enablePatient();
@@ -91,7 +86,6 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
     }
   }
 
-  // Disable or enable a doctor
   void _toggleDoctorStatus(DoctorModel doctor) async {
     if (doctor.disabled) {
       await doctor.enableDoctor();
@@ -104,7 +98,6 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
     }
   }
 
-  // Disable or enable category for a doctor
   void _toggleCategoryStatus(DoctorModel doctor) async {
     if (doctor.categoryDisabled) {
       await doctor.enableCategory();
@@ -117,7 +110,6 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
     }
   }
 
-  // Add new admin
   void _addAdmin() async {
     showDialog(
       context: context,
@@ -154,7 +146,6 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                 if (_adminEmailController.text.isNotEmpty &&
                     _adminUsernameController.text.isNotEmpty &&
                     _adminPasswordController.text.isNotEmpty) {
-                  // Create new admin
                   String email = _adminEmailController.text;
                   String username = _adminUsernameController.text;
                   String password = _adminPasswordController.text;
@@ -174,13 +165,9 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                     verified: true,
                   );
 
-                  // Register new admin in Firebase Authentication
                   User? user = await _authService.register(newUser, password);
                   if (user != null) {
-                    // Add admin to Firestore
                     await newAdmin.createAdmin();
-
-                    // Add admin to users collection
                     await _firestore.collection('users').doc(user.uid).set({
                       'userId': user.uid,
                       'name': newUser.name,
@@ -190,7 +177,6 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                       'verified': newUser.verified,
                     });
 
-                    // Send email with credentials
                     String subject = 'Admin Account Created';
                     String body = 'Your admin account has been created.\n\n'
                         'Username: $username\n'
@@ -222,9 +208,13 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Dashboard'),
+        backgroundColor: Colors.blueAccent,
+        title: const Text('Admin Dashboard', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
         bottom: TabBar(
           controller: _tabController,
+          indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
           tabs: const [
             Tab(text: 'Patients'),
             Tab(text: 'Doctors'),
@@ -261,13 +251,20 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
           itemCount: patients.length,
           itemBuilder: (context, index) {
             var patient = patients[index];
-            return ListTile(
-              title: Text(patient.name),
-              trailing: IconButton(
-                icon: Icon(patient.disabled ? Icons.check : Icons.close),
-                onPressed: () {
-                  _togglePatientStatus(patient);
-                },
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              elevation: 6,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(16),
+                title: Text(patient.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                trailing: IconButton(
+                  icon: Icon(patient.disabled ? Icons.check_circle : Icons.remove_circle),
+                  color: patient.disabled ? Colors.green : Colors.red,
+                  onPressed: () {
+                    _togglePatientStatus(patient);
+                  },
+                ),
               ),
             );
           },
@@ -292,24 +289,33 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
           itemCount: doctors.length,
           itemBuilder: (context, index) {
             var doctor = doctors[index];
-            return ListTile(
-              title: Text(doctor.name),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(doctor.disabled ? Icons.check : Icons.close),
-                    onPressed: () {
-                      _toggleDoctorStatus(doctor);
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(doctor.categoryDisabled ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () {
-                      _toggleCategoryStatus(doctor);
-                    },
-                  ),
-                ],
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              elevation: 6,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(16),
+                title: Text(doctor.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(doctor.disabled ? Icons.check_circle : Icons.remove_circle),
+                      color: doctor.disabled ? Colors.green : Colors.red,
+                      onPressed: () {
+                        _toggleDoctorStatus(doctor);
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(doctor.categoryDisabled ? Icons.visibility_off : Icons.visibility),
+                      color: doctor.categoryDisabled ? Colors.red : Colors.green,
+                      onPressed: () {
+                        _toggleCategoryStatus(doctor);
+                      },
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -321,40 +327,50 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
   Widget _buildCategoryList() {
     return Column(
       children: [
-        ElevatedButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: const Text('Add Category'),
-                  content: TextField(
-                    controller: _categoryNameController,
-                    decoration: const InputDecoration(labelText: 'Category Name'),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('Cancel'),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ElevatedButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Add Category'),
+                    content: TextField(
+                      controller: _categoryNameController,
+                      decoration: const InputDecoration(labelText: 'Category Name'),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        if (_categoryNameController.text.isNotEmpty) {
-                          _addCategory(_categoryNameController.text);
+                    actions: [
+                      TextButton(
+                        onPressed: () {
                           Navigator.of(context).pop();
-                          _categoryNameController.clear();
-                        }
-                      },
-                      child: const Text('Add'),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          child: const Text('Add Category'),
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          if (_categoryNameController.text.isNotEmpty) {
+                            _addCategory(_categoryNameController.text);
+                            Navigator.of(context).pop();
+                            _categoryNameController.clear();
+                          }
+                        },
+                        child: const Text('Add'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            child: const Text('Add Category', style: TextStyle(fontSize: 16)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blueAccent,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
         ),
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
@@ -372,17 +388,24 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
                   var category = categories[index];
-                  return ListTile(
-                    title: Text(category.name),
-                    trailing: IconButton(
-                      icon: Icon(category.disabled ? Icons.check : Icons.close),
-                      onPressed: () {
-                        if (category.disabled) {
-                          _enableCategory(category.categoryId);
-                        } else {
-                          _disableCategory(category.categoryId);
-                        }
-                      },
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    elevation: 6,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(16),
+                      title: Text(category.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      trailing: IconButton(
+                        icon: Icon(category.disabled ? Icons.check_circle : Icons.remove_circle),
+                        color: category.disabled ? Colors.green : Colors.red,
+                        onPressed: () {
+                          if (category.disabled) {
+                            _enableCategory(category.categoryId);
+                          } else {
+                            _disableCategory(category.categoryId);
+                          }
+                        },
+                      ),
                     ),
                   );
                 },
@@ -397,9 +420,19 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
   Widget _buildAdminList() {
     return Column(
       children: [
-        ElevatedButton(
-          onPressed: _addAdmin,
-          child: const Text('Add Admin'),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ElevatedButton(
+            onPressed: _addAdmin,
+            child: const Text('Add Admin', style: TextStyle(fontSize: 16)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
         ),
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
@@ -417,10 +450,15 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                 itemCount: admins.length,
                 itemBuilder: (context, index) {
                   var admin = admins[index];
-                  return ListTile(
-                    title: Text(admin.username),
-                    subtitle: Text(admin.email),
-                    trailing: const Icon(Icons.admin_panel_settings),
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    elevation: 6,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(16),
+                      title: Text(admin.username, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(admin.email),
+                    ),
                   );
                 },
               );
