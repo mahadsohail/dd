@@ -33,10 +33,10 @@ class _DoctorDashboardState extends State<DoctorDashboard> with SingleTickerProv
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Doctor Dashboard'),
+        title: const Text('Doctor Dashboard'),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: () {
               _authService.signOut();
               Navigator.pushReplacementNamed(context, '/login');
@@ -50,10 +50,10 @@ class _DoctorDashboardState extends State<DoctorDashboard> with SingleTickerProv
             child: TabBarView(
               controller: _tabController,
               children: [
-                DoctorInformationScreen(),
-                DoctorAppointmentsScreen(),
+                const DoctorInformationScreen(),
+                const DoctorAppointmentsScreen(),
                 DoctorChatsScreen(),
-                DoctorProfileScreen(),
+                const DoctorProfileScreen(),
               ],
             ),
           ),
@@ -61,7 +61,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> with SingleTickerProv
       ),
       bottomNavigationBar: TabBar(
         controller: _tabController,
-        tabs: [
+        tabs: const [
           Tab(icon: Icon(Icons.info), text: 'Information'),
           Tab(icon: Icon(Icons.calendar_today), text: 'Appointments'),
           Tab(icon: Icon(Icons.chat), text: 'Chats'),

@@ -12,7 +12,7 @@ class DoctorChatsScreen extends StatelessWidget {
       stream: _chatsRef.onValue,
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
         Map<dynamic, dynamic> chats = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
         List<Widget> chatHeads = [];

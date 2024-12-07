@@ -38,7 +38,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> wit
       children: [
         TabBar(
           controller: _tabController,
-          tabs: [
+          tabs: const [
             Tab(text: 'Requests'),
             Tab(text: 'Accepted'),
           ],
@@ -62,7 +62,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> wit
       stream: FirebaseFirestore.instance.collection('appointments').where('status', isEqualTo: 'requested').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
         return ListView(
           children: snapshot.data!.docs.map((doc) {
@@ -73,11 +73,11 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> wit
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.check),
+                    icon: const Icon(Icons.check),
                     onPressed: () => _acceptAppointment(doc.id, doc['patientId']),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close),
+                    icon: const Icon(Icons.close),
                     onPressed: () => _rejectAppointment(doc.id),
                   ),
                 ],
@@ -95,7 +95,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> wit
       stream: FirebaseFirestore.instance.collection('appointments').where('status', isEqualTo: 'accepted').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
         return ListView(
           children: snapshot.data!.docs.map((doc) {

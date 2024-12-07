@@ -58,6 +58,15 @@ class AuthService {
     }
   }
 
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      print('Password reset email sent');
+    } catch (e) {
+      print('Failed to send password reset email: $e');
+    }
+  }
+
   Future<void> sendEmail(String toAddress, String subject, String body) async {
     String username = 'amaanshokat2468@gmail.com';
     String password = 'iron manishero1!2@';
@@ -72,9 +81,9 @@ class AuthService {
 
     try {
       final sendReport = await send(message, smtpServer);
-      print('Message sent: ' + sendReport.toString());
+      print('Message sent: $sendReport');
     } catch (e) {
-      print('Message not sent: ' + e.toString());
+      print('Message not sent: $e');
     }
   }
 

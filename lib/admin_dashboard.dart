@@ -54,7 +54,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
     );
     await newCategory.createCategory();
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Category added successfully')),
+      const SnackBar(content: Text('Category added successfully')),
     );
   }
 
@@ -64,7 +64,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
       'disabled': false,
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Category enabled')),
+      const SnackBar(content: Text('Category enabled')),
     );
   }
 
@@ -74,7 +74,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
       'disabled': true,
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Category disabled')),
+      const SnackBar(content: Text('Category disabled')),
     );
   }
 
@@ -83,11 +83,11 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
     if (patient.disabled) {
       await patient.enablePatient();
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Patient enabled')));
+          const SnackBar(content: Text('Patient enabled')));
     } else {
       await patient.disablePatient();
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Patient disabled')));
+          const SnackBar(content: Text('Patient disabled')));
     }
   }
 
@@ -96,11 +96,11 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
     if (doctor.disabled) {
       await doctor.enableDoctor();
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Doctor enabled')));
+          const SnackBar(content: Text('Doctor enabled')));
     } else {
       await doctor.disableDoctor();
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Doctor disabled')));
+          const SnackBar(content: Text('Doctor disabled')));
     }
   }
 
@@ -109,11 +109,11 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
     if (doctor.categoryDisabled) {
       await doctor.enableCategory();
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Category enabled')));
+          const SnackBar(content: Text('Category enabled')));
     } else {
       await doctor.disableCategory();
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Category disabled')));
+          const SnackBar(content: Text('Category disabled')));
     }
   }
 
@@ -123,21 +123,21 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Add New Admin'),
+          title: const Text('Add New Admin'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: _adminEmailController,
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(labelText: 'Email'),
               ),
               TextField(
                 controller: _adminUsernameController,
-                decoration: InputDecoration(labelText: 'Username'),
+                decoration: const InputDecoration(labelText: 'Username'),
               ),
               TextField(
                 controller: _adminPasswordController,
-                decoration: InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
               ),
             ],
@@ -147,7 +147,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
@@ -200,7 +200,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                     await _authService.sendEmail(email, subject, body);
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Admin added successfully')),
+                      const SnackBar(content: Text('Admin added successfully')),
                     );
 
                     Navigator.of(context).pop();
@@ -210,7 +210,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                   }
                 }
               },
-              child: Text('Add'),
+              child: const Text('Add'),
             ),
           ],
         );
@@ -222,10 +222,10 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin Dashboard'),
+        title: const Text('Admin Dashboard'),
         bottom: TabBar(
           controller: _tabController,
-          tabs: [
+          tabs: const [
             Tab(text: 'Patients'),
             Tab(text: 'Doctors'),
             Tab(text: 'Categories'),
@@ -250,7 +250,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
       stream: _firestore.collection('patients').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         var patients = snapshot.data!.docs.map((doc) {
@@ -281,7 +281,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
       stream: _firestore.collection('doctors').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         var doctors = snapshot.data!.docs.map((doc) {
@@ -327,17 +327,17 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
               context: context,
               builder: (context) {
                 return AlertDialog(
-                  title: Text('Add Category'),
+                  title: const Text('Add Category'),
                   content: TextField(
                     controller: _categoryNameController,
-                    decoration: InputDecoration(labelText: 'Category Name'),
+                    decoration: const InputDecoration(labelText: 'Category Name'),
                   ),
                   actions: [
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text('Cancel'),
+                      child: const Text('Cancel'),
                     ),
                     TextButton(
                       onPressed: () {
@@ -347,21 +347,21 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                           _categoryNameController.clear();
                         }
                       },
-                      child: Text('Add'),
+                      child: const Text('Add'),
                     ),
                   ],
                 );
               },
             );
           },
-          child: Text('Add Category'),
+          child: const Text('Add Category'),
         ),
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
             stream: _firestore.collection('categories').snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
 
               var categories = snapshot.data!.docs.map((doc) {
@@ -399,14 +399,14 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
       children: [
         ElevatedButton(
           onPressed: _addAdmin,
-          child: Text('Add Admin'),
+          child: const Text('Add Admin'),
         ),
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
             stream: _firestore.collection('admins').snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
 
               var admins = snapshot.data!.docs.map((doc) {
@@ -420,7 +420,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                   return ListTile(
                     title: Text(admin.username),
                     subtitle: Text(admin.email),
-                    trailing: Icon(Icons.admin_panel_settings),
+                    trailing: const Icon(Icons.admin_panel_settings),
                   );
                 },
               );

@@ -67,7 +67,7 @@ class _DoctorInformationScreenState extends State<DoctorInformationScreen> {
           children: [
             TextFormField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: 'Name'),
+              decoration: const InputDecoration(labelText: 'Name'),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your name';
@@ -77,7 +77,7 @@ class _DoctorInformationScreenState extends State<DoctorInformationScreen> {
             ),
             TextFormField(
               controller: _qualificationController,
-              decoration: InputDecoration(labelText: 'Qualification'),
+              decoration: const InputDecoration(labelText: 'Qualification'),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your qualification';
@@ -87,7 +87,7 @@ class _DoctorInformationScreenState extends State<DoctorInformationScreen> {
             ),
             TextFormField(
               controller: _experienceController,
-              decoration: InputDecoration(labelText: 'Experience'),
+              decoration: const InputDecoration(labelText: 'Experience'),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your experience';
@@ -98,11 +98,11 @@ class _DoctorInformationScreenState extends State<DoctorInformationScreen> {
             // Add Profile Picture, Rating, and Slots
             ElevatedButton(
               onPressed: _saveDoctorInfo,
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
             ElevatedButton(
               onPressed: _addSlot,
-              child: Text('Add Slot'),
+              child: const Text('Add Slot'),
             ),
           ],
         ),

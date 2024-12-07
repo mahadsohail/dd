@@ -15,10 +15,10 @@ class _PatientDashboardState extends State<PatientDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Patient Dashboard'),
+        title: const Text('Patient Dashboard'),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: () {
               _authService.signOut();
               Navigator.pushReplacementNamed(context, '/login');
@@ -26,7 +26,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
           ),
         ],
       ),
-      body: Center(
+      body: const Center(
         child: Text('Welcome to Patient Dashboard'),
       ),
       bottomNavigationBar: BottomNavigationBar(

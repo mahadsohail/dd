@@ -29,7 +29,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
           children: [
             TextFormField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'New Password'),
+              decoration: const InputDecoration(labelText: 'New Password'),
               obscureText: true,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -40,7 +40,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             ),
             TextFormField(
               controller: _confirmPasswordController,
-              decoration: InputDecoration(labelText: 'Confirm Password'),
+              decoration: const InputDecoration(labelText: 'Confirm Password'),
               obscureText: true,
               validator: (value) {
                 if (value != _passwordController.text) {
@@ -51,7 +51,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             ),
             ElevatedButton(
               onPressed: _changePassword,
-              child: Text('Change Password'),
+              child: const Text('Change Password'),
             ),
           ],
         ),

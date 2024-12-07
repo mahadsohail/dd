@@ -32,13 +32,13 @@ class MyApp extends StatelessWidget {
         ),
         initialRoute: '/',
         routes: {
-          '/': (context) => Wrapper(),
-          '/login': (context) => LoginScreen(),
-          '/register': (context) => RegisterScreen(),
-          '/patient_dashboard': (context) => PatientDashboard(),
-          '/doctor_dashboard': (context) => DoctorDashboard(),
-          '/admin_dashboard': (context) => AdminDashboard(),
-          '/admin_register': (context) => AdminRegisterScreen(),
+          '/': (context) => const Wrapper(),
+          '/login': (context) => const LoginScreen(),
+          '/register': (context) => const RegisterScreen(),
+          '/patient_dashboard': (context) => const PatientDashboard(),
+          '/doctor_dashboard': (context) => const DoctorDashboard(),
+          '/admin_dashboard': (context) => const AdminDashboard(),
+          '/admin_register': (context) => const AdminRegisterScreen(),
         },
       ),
     );
@@ -54,7 +54,7 @@ class Wrapper extends StatelessWidget {
       future: checkIfUsersExist(),
       builder: (context, userCheckSnapshot) {
         if (userCheckSnapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Loading state for user check
+          return const CircularProgressIndicator(); // Loading state for user check
         }
 
         if (userCheckSnapshot.data == false) {
@@ -66,36 +66,36 @@ class Wrapper extends StatelessWidget {
         final user = Provider.of<User?>(context);
 
         if (user == null) {
-          return LoginScreen(); // If no user is logged in, show login screen
+          return const LoginScreen(); // If no user is logged in, show login screen
         } else {
           return FutureBuilder<DocumentSnapshot>(
             future: FirebaseFirestore.instance.collection('users').doc(user.uid).get(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator(); // Loading state
+                return const CircularProgressIndicator(); // Loading state
               }
 
               if (snapshot.hasError) {
-                return Text("Something went wrong");
+                return const Text("Something went wrong");
               }
 
               if (snapshot.hasData && !snapshot.data!.exists) {
-                return Text("User does not exist");
+                return const Text("User does not exist");
               }
 
               // Check user type and navigate to the appropriate dashboard
               if (snapshot.hasData && snapshot.data!.exists) {
                 var userType = snapshot.data!['type'];
                 if (userType == 'patient') {
-                  return PatientDashboard();
+                  return const PatientDashboard();
                 } else if (userType == 'doctor') {
-                  return DoctorDashboard();
+                  return const DoctorDashboard();
                 } else if (userType == 'admin') {
-                  return AdminDashboard();
+                  return const AdminDashboard();
                 }
               }
 
-              return Text("Unknown user type");
+              return const Text("Unknown user type");
             },
           );
         }
