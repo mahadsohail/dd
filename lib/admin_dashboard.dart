@@ -44,6 +44,14 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
     super.dispose();
   }
 
+  void _logout() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacementNamed(context, '/login'); // Ensure '/login' is the login screen route in your app
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Logged out successfully')),
+    );
+  }
+
   void _addCategory(String name) async {
     CategoryModel newCategory = CategoryModel(
       categoryId: '',
@@ -210,6 +218,12 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
         title: const Text('Admin Dashboard', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,
@@ -296,7 +310,6 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
               child: ListTile(
                 contentPadding: const EdgeInsets.all(16),
                 title: Text(doctor.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -457,7 +470,6 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(16),
                       title: Text(admin.username, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(admin.email),
                     ),
                   );
                 },
