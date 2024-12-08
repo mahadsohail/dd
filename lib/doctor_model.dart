@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class DoctorModel {
   String doctorId;
   String name;
+  String email;
   String specialization;
   String qualification;
   String profilePic;
@@ -14,6 +15,7 @@ class DoctorModel {
   DoctorModel({
     required this.doctorId,
     required this.name,
+    required this.email,
     required this.specialization,
     required this.qualification,
     required this.profilePic,
@@ -27,6 +29,7 @@ class DoctorModel {
     return DoctorModel(
       doctorId: doc.id,
       name: doc['name'],
+      email: doc['email'],
       specialization: doc['specialization'],
       qualification: doc['qualification'],
       profilePic: doc['profilePic'],
@@ -40,6 +43,7 @@ class DoctorModel {
   Map<String, dynamic> toMap() {
     return {
       'name': name,
+      'email': email,
       'specialization': specialization,
       'qualification': qualification,
       'profilePic': profilePic,

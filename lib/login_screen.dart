@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'auth_service.dart';
+import 'cloudinary_service.dart';
+import 'doctor_model.dart';
 import 'user_model.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -29,6 +34,23 @@ class _LoginScreenState extends State<LoginScreen> {
     if (userQuery.docs.isNotEmpty) {
       DocumentSnapshot userDoc = userQuery.docs.first;
       UserModel userModel = UserModel.fromDocument(userDoc);
+
+      // Check if the user's type is doctor
+      if (userModel.type == 'doctor') {
+        // Check if the doctor's profile exists
+        DocumentSnapshot doctorDoc = await FirebaseFirestore.instance
+            .collection('doctors')
+            .doc(userModel.userId)
+            .get();
+
+        if (!doctorDoc.exists) {
+          // If doctor profile does not exist, show profile dialog
+          _showDoctorProfileDialog(userModel, password);
+          return; // Exit the login process
+        }
+      }
+
+      // Sign in the user
       User? user = await _authService.signIn(userModel.email, password);
 
       if (user != null) {
@@ -41,12 +63,12 @@ class _LoginScreenState extends State<LoginScreen> {
         UserModel updatedUserModel = UserModel.fromDocument(updatedUserDoc);
 
         if (updatedUserModel.verified) {
-          if (updatedUserModel.type == 'patient') {
-            Navigator.pushReplacementNamed(context, '/patient_dashboard');
-          } else if (updatedUserModel.type == 'doctor') {
+          if (updatedUserModel.type == 'doctor') {
+            // Navigate to the doctor dashboard if profile exists
             Navigator.pushReplacementNamed(context, '/doctor_dashboard');
-          } else if (updatedUserModel.type == 'admin') {
-            Navigator.pushReplacementNamed(context, '/admin_dashboard');
+          } else {
+            // Handle other types of users (patient/admin)
+            Navigator.pushReplacementNamed(context, '/patient_dashboard');
           }
         } else {
           // Handle email not verified
@@ -67,14 +89,144 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }
       } else {
-        // Handle sign in error
         _showErrorDialog('Login Failed', 'Invalid username or password');
       }
     } else {
-      // Handle user not found
       _showErrorDialog('User Not Found', 'No user found with this username');
     }
   }
+
+  void _showDoctorProfileDialog(UserModel user, String password) {
+    final TextEditingController qualificationsController = TextEditingController();
+    final TextEditingController experienceController = TextEditingController();
+    String? specialization;
+    File? profileImage;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Complete Your Profile'),
+        content: SingleChildScrollView(
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                children: [
+                  // Profile Picture
+                  profileImage == null
+                      ? IconButton(
+                    icon: Icon(Icons.camera_alt),
+                    onPressed: () async {
+                      final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                      if (pickedFile != null) {
+                        setState(() {
+                          profileImage = File(pickedFile.path);
+                        });
+                      }
+                    },
+                  )
+                      : CircleAvatar(
+                    radius: 50,
+                    backgroundImage: FileImage(profileImage!),
+                  ),
+                  TextField(
+                    controller: qualificationsController,
+                    decoration: const InputDecoration(
+                      labelText: 'Qualifications',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  TextField(
+                    controller: experienceController,
+                    decoration: const InputDecoration(
+                      labelText: 'Experience (Years)',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                  SizedBox(height: 10),
+                  // Specialization Dropdown (fetch categories from Firestore)
+                  FutureBuilder<QuerySnapshot>(
+                    future: FirebaseFirestore.instance.collection('categories').get(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Error fetching categories');
+                      } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Text('No categories available');
+                      } else {
+                        List<String> categories = snapshot.data!.docs
+                            .map((doc) => doc['name'] as String)
+                            .toList();
+                        return DropdownButton<String>(
+                          hint: Text('Select Specialization'),
+                          value: specialization,
+                          onChanged: (value) {
+                            setState(() {
+                              specialization = value;
+                            });
+                          },
+                          items: categories.map((category) {
+                            return DropdownMenuItem<String>(
+                              value: category,
+                              child: Text(category),
+                            );
+                          }).toList(),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              if (specialization != null &&
+                  profileImage != null &&
+                  qualificationsController.text != "" &&
+                  experienceController.text != "") {
+                // Upload the image to Cloudinary
+                String? imageUrl = await CloudinaryService().uploadImage(profileImage!);
+                if (imageUrl == null) {
+                  _showErrorDialog('Error', 'Failed to upload image');
+                  return;
+                }
+
+                // Create the DoctorModel
+                DoctorModel doctor = DoctorModel(
+                  doctorId: user.userId,
+                  name: user.name,
+                  email: user.email,
+                  specialization: specialization!,
+                  qualification: qualificationsController.text,
+                  profilePic: imageUrl,
+                  experience: int.parse(experienceController.text),
+                  rating: 0.0,
+                  disabled: false,
+                  categoryDisabled: false,
+                );
+
+                // Save the doctor profile to Firestore
+                await FirebaseFirestore.instance.collection('doctors').doc(user.userId).set(doctor.toMap());
+
+                // Navigate to the doctor dashboard
+                Navigator.pop(context);
+              } else {
+                // Show error if necessary fields are missing
+                _showErrorDialog('Error', 'Please complete all fields');
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   void _showErrorDialog(String title, String content) {
     showDialog(

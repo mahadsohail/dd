@@ -17,15 +17,35 @@ class UserModel {
     required this.verified,
   });
 
-  // Add fromDocument method if you need to fetch UserModel from Firestore document
+  // Factory constructor to create UserModel from Firestore document
   factory UserModel.fromDocument(DocumentSnapshot doc) {
     return UserModel(
-      userId: doc['userId'],
+      userId: doc.id,
       name: doc['name'],
       userName: doc['userName'],
       email: doc['email'],
       type: doc['type'],
       verified: doc['verified'],
     );
+  }
+
+  // Static method to fetch user details from Firestore by userId
+  static Future<UserModel?> fetchUserById(String userId) async {
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (doc.exists) {
+        return UserModel.fromDocument(doc);
+      } else {
+        print("User does not exist");
+        return null;
+      }
+    } catch (e) {
+      print("Error fetching user details: $e");
+      return null;
+    }
   }
 }
